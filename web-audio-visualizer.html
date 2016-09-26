@@ -118,22 +118,15 @@
                // drawCircle(xPos, yPos);
             }
         }
-          function makeStars(){
+        
+         function drawCircle(xPos, yPos,alpha){
+                alpha=(alpha/100)-1;
             
-            for(var i=0; i<starCount; i++){
-                 
-
-                
-                drawCircle(starsx[i], starsy[i]);
-            }
-            
-        }
-         function drawCircle(xPos, yPos){
-                console.log("drew circle");
                 ctx.beginPath();
-                ctx.fillStyle='rgba(255,255,255,1.0)';
-                ctx.arc(xPos,yPos,1, 0,2*Math.PI,false);
+                ctx.fillStyle='rgba(255,255,255,'+alpha+')';
+                ctx.arc(xPos,yPos,2, 0,2*Math.PI,false);
                 ctx.fill();
+                
          }
 		function createWebAudioContextWithAnalyserNode(audioElement) {
 			var audioCtx, analyserNode, sourceNode;
@@ -212,8 +205,10 @@
 			
 			// DRAW!
 			ctx.clearRect(0,0,800,600); 
-             makeStars();
-           
+			//make stars
+              		for(var i=0; i<starCount; i++){
+               			 drawCircle(starsx[i], starsy[i], data[3]);
+            		}
 			var barWidth = 4;
 			var barSpacing = 1;
 			var barHeight = 100;
