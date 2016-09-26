@@ -44,6 +44,8 @@
         var invert = false, tintRed=false, noise=false, lines=false;
         var starsx = [];
         var starsy = [];
+        var gravCircs = [];
+        var prevData = [256];
 		var skullHead, skullJaw, skullHelmet;
 		function init(){
 			// set up canvas stuff
@@ -125,6 +127,12 @@
             for(var i=0; i<starCount; i++){
                 drawCircle(starsx[i], starsy[i]);
             }
+        }
+
+        function zeroGravity(){
+        	for(var i = 0; i < gravCircs.length; i++){
+        		
+        	}
         }
         
          function drawCircle(xPos, yPos,alpha){
@@ -220,59 +228,44 @@
                 ctx.drawImage(skullHelmet, 350,60,250,270);
                 ctx.restore();
             }
+
 			// loop through the data and draw!
+			ctx.fillStyle = 'rgba(0,230,255,0.6)'; 
+			ctx.strokeStyle = 'rgba(0,230,255,0.6)'; 
+			ctx.lineWidth = barWidth;
+			ctx.lineCap = 'round';
+
 			for(var i=0; i<data.length; i++) { 
-				ctx.fillStyle = 'rgba(0,255,0,0.6)'; 
           
 				// the higher the amplitude of the sample (bin) the taller the bar
 				// remember we have to draw our bars left-to-right and top-down
-				ctx.fillRect(i * (barWidth + barSpacing),topSpacing + 256-data[i],barWidth,barHeight); 
-                ctx.fillRect(640-i*(barWidth+barSpacing), topSpacing+256-data[i]-20,barWidth, barHeight);
-                
+				//ctx.fillRect(i * (barWidth + barSpacing),topSpacing + 256-data[i],barWidth,barHeight); 
+                //ctx.fillRect(640-i*(barWidth+barSpacing), topSpacing+256-data[i]-20,barWidth, barHeight);
+
+                ctx.beginPath();
+                ctx.moveTo(i * (barWidth + barSpacing), topSpacing + 256-data[i]);
+                ctx.lineTo(i * (barWidth + barSpacing), topSpacing + 256-data[i] + barHeight);
+                ctx.stroke();
+
+                if((data[i] - prevData[i]) >= 20){
+                	ctx.save();
+		        	ctx.fillStyle = 'red';
+		        	ctx.beginPath();
+		        	ctx.arc(i * (barWidth + barSpacing), topSpacing + 256-data[i], barWidth, 0, Math.PI*2, false);
+		        	ctx.fill();
+		        	ctx.closePath();
+		        	ctx.restore();
+                }
+
+                zeroGravity();
                 var percent = data[i]/255;
-                
+                prevData[i] = data[i];
             }
 			
               
           // manipulatePixels();
 			 
 		} //End of update
-		
-         /*function manipulatePixels(){
-                var imageData=ctx.getImageData(0,0,canvas.width, canvas.height);
-                
-                var data = imageData.data;
-                var length = data.length;
-                var width= imageData.width;
-                
-                for(var i=0; i<length; i+=4){
-                    if(tintRed){
-                        data[i] = data[i]+100;
-                    }
-                    if(invert){
-                        var red = data[i], green = data[i+1], blue = data[i+2];
-                        data[i]=255-red;
-                        data[i+1] = 255 - green;
-                        data[i+2]=255-blue;
-                    }
-                    if(noise && Math.random()<.10){
-                        data[i]=data[i+1]=data[i+2]=128;
-                    }
-                    if(lines){
-                        var row=Math.floor(i/4/width);
-                        if (row%50==0){
-                            data[i]=data[i+1]=data[i+2]=data[i+3]=255;
-                            
-                        data [i+(width*4)]=
-                        data [i+(width*4)+1]=
-                        data [i+(width*4)+2]=
-                        data [i+(width*4) +3]=255;
-                        }
-                    }
-                }
-                ctx.putImageData(imageData,0,0);
-            }*/
-        
         
 		// HELPER
 		function makeColor(red, green, blue, alpha){
