@@ -44,6 +44,7 @@
         var invert = false, tintRed=false, noise=false, lines=false;
         var starsx = [];
         var starsy = [];
+        var numCircs = 0;
         var gravCircs = [];
         var prevData = [256];
 		var skullHead, skullJaw, skullHelmet;
@@ -128,11 +129,39 @@
                 drawCircle(starsx[i], starsy[i]);
             }
         }
+        
+        function createGravity(x, y, rad){
+            var circ = {
+                gxPos : x,
+                gyPos : y,
+                gxSpeed : Math.random() * 4 - 2,
+                gySpeed : Math.random() * 2,
+                gradius : rad
+            }
+            gravCircs[numCircs] = circ;
+            numCircs++;
+        }
 
         function zeroGravity(){
-        	for(var i = 0; i < gravCircs.length; i++){
-        		
-        	}
+            ctx.save();
+            ctx.fillStyle = 'red';
+            
+        	/*for(var i = 0; i < gravCircs.length; i++){
+            console.dir(gravCircs[i]);
+            //console.log(i + " " + gravCircs.length);
+            gravCircs[i].gxPos += gravCircs[i].gxSpeed;
+            gravCircs[i].gyPos += gravCircs[i].gySpeed;
+            gravCircs[i].gradius -= gravCircs[i].gySpeed;
+            if(gravCircs[i].gradius <= 0){
+                gravCircs.splice(i, 1);
+            }
+            else{
+              ctx.beginPath();
+              ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gradius, 0, Math.PI*2, false);
+              ctx.fill();
+              ctx.closePath();
+            }*/
+            ctx.restore();
         }
         
          function drawCircle(xPos, yPos,alpha){
@@ -243,18 +272,12 @@
                 //ctx.fillRect(640-i*(barWidth+barSpacing), topSpacing+256-data[i]-20,barWidth, barHeight);
 
                 ctx.beginPath();
-                ctx.moveTo(i * (barWidth + barSpacing), topSpacing + 256-data[i]);
-                ctx.lineTo(i * (barWidth + barSpacing), topSpacing + 256-data[i] + barHeight);
+                ctx.moveTo(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i]);
+                ctx.lineTo(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i] + barHeight);
                 ctx.stroke();
 
                 if((data[i] - prevData[i]) >= 20){
-                	ctx.save();
-		        	ctx.fillStyle = 'red';
-		        	ctx.beginPath();
-		        	ctx.arc(i * (barWidth + barSpacing), topSpacing + 256-data[i], barWidth, 0, Math.PI*2, false);
-		        	ctx.fill();
-		        	ctx.closePath();
-		        	ctx.restore();
+                    createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
                 }
 
                 zeroGravity();
