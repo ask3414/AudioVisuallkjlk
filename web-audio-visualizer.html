@@ -235,21 +235,28 @@
                			 drawCircle(starsx[i], starsy[i], data[3]);
             		}
       var barSpacing = 1;
-			var barWidth = (canvas.width - barSpacing*85)/85;
+			var barWidth = (canvas.width - barSpacing*30)/30;
 			var barHeight = 100;
 			var topSpacing = 50;
            
 			if(currentSound==SOUND_2){
                 //draw first skull
                 ctx.save();
-                ctx.globalAlpha=.5;                 
-                ctx.drawImage(skullJaw, 45, data[3], 250,270);
+                ctx.globalAlpha=.5;      
+                 var skullY = data[1];
+                 if (skullY<160){
+                    skullY=160;
+                }
+                else if(skullY>160){
+                    skullY=data[1]-50;
+                }
+                ctx.drawImage(skullJaw, 45, skullY, 250,270);
                 ctx.drawImage(skullHead, 50, 60, 250,270);
                 
                 ctx.drawImage(skullHelmet, 50,60,250,270);
                 
                 //draw second skull
-                ctx.drawImage(skullJaw, 345, data[3], 250,270);
+                ctx.drawImage(skullJaw, 345, skullY, 250,270);
                 ctx.drawImage(skullHead, 350, 60, 250,270);
                 
                 ctx.drawImage(skullHelmet, 350,60,250,270);
