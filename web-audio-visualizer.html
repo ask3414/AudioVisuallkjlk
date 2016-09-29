@@ -46,8 +46,9 @@
         var starsy = [];
         var numCircs = 0;
         var gravCircs = [];
-        var prevData = [256];
+        var prevData = [NUM_SAMPLES];
 		var skullHead, skullJaw, skullHelmet;
+        var testInt = 0;
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -134,34 +135,30 @@
             var circ = {
                 gxPos : x,
                 gyPos : y,
-                gxSpeed : Math.random() * 4 - 2,
-                gySpeed : Math.random() * 2,
-                gradius : rad
+                gxSpeed : Math.random() * 3 - .5,
+                gySpeed : Math.random() * 3,
+                gRadius : rad,
+                grSpeed : Math.random() * 2
             }
-            gravCircs[numCircs] = circ;
-            numCircs++;
+            gravCircs.push(circ);
         }
 
         function zeroGravity(){
-            ctx.save();
-            ctx.fillStyle = 'red';
-            
-        	/*for(var i = 0; i < gravCircs.length; i++){
-            console.dir(gravCircs[i]);
-            //console.log(i + " " + gravCircs.length);
-            gravCircs[i].gxPos += gravCircs[i].gxSpeed;
-            gravCircs[i].gyPos += gravCircs[i].gySpeed;
-            gravCircs[i].gradius -= gravCircs[i].gySpeed;
-            if(gravCircs[i].gradius <= 0){
-                gravCircs.splice(i, 1);
+        	for(var i = 0; i < gravCircs.length; i++){
+                gravCircs[i].gxPos += gravCircs[i].gxSpeed;
+                gravCircs[i].gyPos -= gravCircs[i].gySpeed;
+                gravCircs[i].gRadius -= gravCircs[i].grSpeed;
+
+                if(gravCircs[i].gRadius < 0){
+                    gravCircs.splice(i, 1);
+                }
+                else{
+                  ctx.beginPath();
+                  ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gRadius, 0, Math.PI*2, false);
+                  ctx.fill();
+                  ctx.closePath();
+                }
             }
-            else{
-              ctx.beginPath();
-              ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gradius, 0, Math.PI*2, false);
-              ctx.fill();
-              ctx.closePath();
-            }*/
-            ctx.restore();
         }
         
          function drawCircle(xPos, yPos,alpha){
@@ -218,6 +215,7 @@
 		}
 		
 		function update() { 
+            testInt++;
 			// this schedules a call to the update() method in 1/60 seconds
 			requestAnimationFrame(update);
 			
@@ -236,8 +234,8 @@
               		for(var i=0; i<starCount; i++){
                			 drawCircle(starsx[i], starsy[i], data[3]);
             		}
-			var barWidth = 4;
-			var barSpacing = 1;
+      var barSpacing = 1;
+			var barWidth = (canvas.width - barSpacing*85)/85;
 			var barHeight = 100;
 			var topSpacing = 50;
            
@@ -264,7 +262,7 @@
 			ctx.lineWidth = barWidth;
 			ctx.lineCap = 'round';
 
-			for(var i=0; i<data.length; i++) { 
+			for(var i=0; i<85; i++) { 
           
 				// the higher the amplitude of the sample (bin) the taller the bar
 				// remember we have to draw our bars left-to-right and top-down
@@ -279,11 +277,11 @@
                 if((data[i] - prevData[i]) >= 20){
                     createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
                 }
-
-                zeroGravity();
+                
                 var percent = data[i]/255;
                 prevData[i] = data[i];
             }
+                zeroGravity();
 			
               
           // manipulatePixels();
