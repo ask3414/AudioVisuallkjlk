@@ -41,14 +41,14 @@
 		var audioElement;
 		var analyserNode;
 		var canvas,ctx;
-        var invert = false, tintRed=false, noise=false, lines=false;
-        var starsx = [];
-        var starsy = [];
-        var numCircs = 0;
-        var gravCircs = [];
-        var prevData = [NUM_SAMPLES];
+    var invert = false, tintRed=false, noise=false, lines=false;
+    var starsx = [];
+    var starsy = [];
+    var barx,bartop,barbot;
+    var gravCircs = [];
+    var prevData = [NUM_SAMPLES];
 		var skullHead, skullJaw, skullHelmet;
-        var testInt = 0;
+
 		function init(){
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
@@ -113,63 +113,64 @@
 		}
 		
 		function initializeStars(){
-            
-            for(var i=0; i<starCount; i++){
-                 
-                var xPos=Math.random()*canvas.width;
-                var yPos = Math.random()*canvas.height;
-                
-               starsx[i]=xPos;
-               starsy[i]=yPos;
-               // drawCircle(xPos, yPos);
-            }
-        }
-          function makeStars(){
-            
-            for(var i=0; i<starCount; i++){
-                drawCircle(starsx[i], starsy[i]);
-            }
-        }
         
-        function createGravity(x, y, rad){
-            var circ = {
-                gxPos : x,
-                gyPos : y,
-                gxSpeed : Math.random() * 3 - .5,
-                gySpeed : Math.random() * 3,
-                gRadius : rad,
-                grSpeed : Math.random() * 2
-            }
-            gravCircs.push(circ);
-        }
-
-        function zeroGravity(){
-        	for(var i = 0; i < gravCircs.length; i++){
-                gravCircs[i].gxPos += gravCircs[i].gxSpeed;
-                gravCircs[i].gyPos -= gravCircs[i].gySpeed;
-                gravCircs[i].gRadius -= gravCircs[i].grSpeed;
-
-                if(gravCircs[i].gRadius < 0){
-                    gravCircs.splice(i, 1);
-                }
-                else{
-                  ctx.beginPath();
-                  ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gRadius, 0, Math.PI*2, false);
-                  ctx.fill();
-                  ctx.closePath();
-                }
-            }
-        }
-        
-         function drawCircle(xPos, yPos,alpha){
-                alpha=(alpha/100)-1;
+        for(var i=0; i<starCount; i++){
+             
+            var xPos=Math.random()*canvas.width;
+            var yPos = Math.random()*canvas.height;
             
-                ctx.beginPath();
-                ctx.fillStyle='rgba(255,255,255,'+alpha+')';
-                ctx.arc(xPos,yPos,2, 0,2*Math.PI,false);
-                ctx.fill();
-                
-         }
+           starsx[i]=xPos;
+           starsy[i]=yPos;
+           // drawCircle(xPos, yPos);
+        }
+    }
+    
+    function makeStars(){
+        
+        for(var i=0; i<starCount; i++){
+            drawCircle(starsx[i], starsy[i]);
+        }
+    }
+    
+    function createGravity(x, y, rad){
+        var circ = {
+            gxPos : x,
+            gyPos : y,
+            gxSpeed : Math.random() * 3 - .5,
+            gySpeed : Math.random() * 3,
+            gRadius : rad,
+            grSpeed : Math.random() * 2
+        }
+        gravCircs.push(circ);
+    }
+
+    function zeroGravity(){
+    	for(var i = 0; i < gravCircs.length; i++){
+            gravCircs[i].gxPos += gravCircs[i].gxSpeed;
+            gravCircs[i].gyPos -= gravCircs[i].gySpeed;
+            gravCircs[i].gRadius -= gravCircs[i].grSpeed;
+
+            if(gravCircs[i].gRadius < 0){
+                gravCircs.splice(i, 1);
+            }
+            else{
+              ctx.beginPath();
+              ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gRadius, 0, Math.PI*2, false);
+              ctx.fill();
+              ctx.closePath();
+            }
+        }
+    }
+    
+    function drawCircle(xPos, yPos,alpha){
+        alpha=(alpha/100)-1;
+    
+        ctx.beginPath();
+        ctx.fillStyle='rgba(255,255,255,'+alpha+')';
+        ctx.arc(xPos,yPos,2, 0,2*Math.PI,false);
+        ctx.fill();
+            
+    }
 		function createWebAudioContextWithAnalyserNode(audioElement) {
 			var audioCtx, analyserNode, sourceNode;
 
@@ -215,7 +216,6 @@
 		}
 		
 		function update() { 
-            testInt++;
 			// this schedules a call to the update() method in 1/60 seconds
 			requestAnimationFrame(update);
 			
@@ -231,18 +231,18 @@
 			// DRAW!
 			ctx.clearRect(0,0,800,600); 
 			//make stars
-              		for(var i=0; i<starCount; i++){
-               			 drawCircle(starsx[i], starsy[i], data[3]);
-            		}
-      var barSpacing = 1;
-			var barWidth = (canvas.width - barSpacing*30)/30;
+  		for(var i=0; i<starCount; i++){
+   			 drawCircle(starsx[i], starsy[i], data[3]);
+		  }
+      var barSpacing = 5;
+			var barWidth = (canvas.width - barSpacing*29)/30;
 			var barHeight = 100;
 			var topSpacing = 50;
            
 			if(currentSound==SOUND_2){
                 //draw first skull
-                ctx.save();
-                ctx.globalAlpha=.5;      
+                 var skullWidth = 230+(data[0]*0.2);
+                 var skullHeight = 250+(data[0]*0.2);
                  var skullY = data[1];
                  if (skullY<160){
                     skullY=160;
@@ -250,48 +250,61 @@
                 else if(skullY>160){
                     skullY=data[1]-50;
                 }
-                ctx.drawImage(skullJaw, 45, skullY, 250,270);
-                ctx.drawImage(skullHead, 50, 60, 250,270);
+                ctx.save();
+                ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
+                ctx.drawImage(skullJaw, 60, skullY,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, 65, 70,skullWidth,skullHeight);
                 
-                ctx.drawImage(skullHelmet, 50,60,250,270);
+                ctx.drawImage(skullHelmet, 65,70,skullWidth,skullHeight);
                 
                 //draw second skull
-                ctx.drawImage(skullJaw, 345, skullY, 250,270);
-                ctx.drawImage(skullHead, 350, 60, 250,270);
+                ctx.drawImage(skullJaw, 360, skullY,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, 365, 70,skullWidth,skullHeight);
                 
-                ctx.drawImage(skullHelmet, 350,60,250,270);
+                ctx.drawImage(skullHelmet, 365,70,skullWidth,skullHeight);
                 ctx.restore();
             }
 
 			// loop through the data and draw!
-			ctx.fillStyle = 'rgba(0,230,255,0.6)'; 
+      ctx.fillStyle = 'rgba(0,140,175,1)'; 
 			ctx.strokeStyle = 'rgba(0,230,255,0.6)'; 
-			ctx.lineWidth = barWidth;
 			ctx.lineCap = 'round';
 
 			for(var i=0; i<85; i++) { 
           
 				// the higher the amplitude of the sample (bin) the taller the bar
 				// remember we have to draw our bars left-to-right and top-down
-				//ctx.fillRect(i * (barWidth + barSpacing),topSpacing + 256-data[i],barWidth,barHeight); 
-                //ctx.fillRect(640-i*(barWidth+barSpacing), topSpacing+256-data[i]-20,barWidth, barHeight);
 
-                ctx.beginPath();
-                ctx.moveTo(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i]);
-                ctx.lineTo(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i] + barHeight);
-                ctx.stroke();
+          barx = i * (barWidth + barSpacing) + barWidth/2;
+          bartop = topSpacing + 256-data[i];
+          barbot = bartop + barHeight;
 
-                if((data[i] - prevData[i]) >= 20){
-                    createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
-                }
-                
-                var percent = data[i]/255;
-                prevData[i] = data[i];
+          if(currentSound == SOUND_2){
+            if((i < 5 || i > 11) && (i < 19 || i > 25)){
+              drawBar('rgba(0,140,175,1)', barx, bartop, barbot, barWidth);
+              drawBar('rgba(0,200,230,1)', barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
+              drawBar('rgba(255,255,255,1)', barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
+
+              if((data[i] - prevData[i]) >= 20){
+                  createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
+              }
             }
-                zeroGravity();
+          }
+          
+          else{
+            drawBar('rgba(0,140,175,1)', barx, bartop, barbot, barWidth);
+            drawBar('rgba(0,200,230,1)', barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
+            console.log(data[i] - prevData[i]);
+            drawBar('rgba(255,255,255,1)', barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
+
+            if((data[i] - prevData[i]) >= 20){
+                createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
+            }
+          }
+          prevData[i] = data[i];
+      }
+          zeroGravity();
 			
-              
-          // manipulatePixels();
 			 
 		} //End of update
         
@@ -300,6 +313,15 @@
    			var color='rgba('+red+','+green+','+blue+', '+alpha+')';
    			return color;
 		}
+
+    function drawBar(color, x, top, bot, width){
+        ctx.strokeStyle = color; 
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x, top);
+        ctx.lineTo(x, bot);
+        ctx.stroke();
+    }
 		
 		 // FULL SCREEN MODE
 		function requestFullscreen(element) {
