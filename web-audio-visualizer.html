@@ -60,9 +60,12 @@
 		var starsx = [];
         var starsy = [];
         
+        var delayAmount=0;
+        var delayNode;
+        
 		var canvas,ctx;
        
-        //var invert = false, tintRed=false, noise=false, lines=false;
+        var delay=false;
         
         var colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
         var barx,bartop,barbot;
@@ -78,36 +81,16 @@
 			ctx = canvas.getContext("2d");
             ctx.canvas.width = window.innerWidth-400;
             ctx.canvas.height = window.innerHeight-100;
-             document.querySelector("#invert").onchange=function(e){
+             document.querySelector("#delay").onchange=function(e){
+                 
                   if(this.checked){
-                      invert=true;
+                      delayAmount=0.5;
+                      console.log('checked');
                   }
                   else{
-                      invert=false;
+                      delayAmount=0;
                   }
-              };         document.querySelector("#noise").onchange=function(e){
-                  if(this.checked){
-                      noise=true;
-                  }
-                  else{
-                      noise=false;
-                  }
-              }; document.querySelector("#lines").onchange=function(e){
-                  if(this.checked){
-                      lines=true;
-                  }
-                  else{
-                      lines=false;
-                  }
-              };
-               document.querySelector("#tint").onchange=function(e){
-                  if(this.checked){
-                      tintRed=true;
-                  }
-                  else{
-                      tintRed=false;
-                  }
-              };
+              };         
             initializeStars();
           // get reference to <audio> element on page
 			audioElement = document.querySelector('audio');
@@ -194,8 +177,11 @@
 
 			// create new AudioContext
 			audioCtx = new (window.AudioContext || window.webkitAudioContext);
-			
-			// create an analyser node
+            
+		
+            delayNode=audioCtx.createDelay();
+            
+            // create an analyser node
 			analyserNode = audioCtx.createAnalyser();
 			
 			// fft stands for Fast Fourier Transform
@@ -203,7 +189,11 @@
 			
 			// this is where we hook up the <audio> element to the analyserNode
 			sourceNode = audioCtx.createMediaElementSource(audioElement); 
-			sourceNode.connect(analyserNode);
+			sourceNode.connect(audioCtx.destination);
+            
+            sourceNode.connect(delayNode);
+            delayNode.connect(analyserNode);
+            analyserNode.connect(audioCtx.destination);
 			
 			// here we connect to the destination i.e. speakers
 			analyserNode.connect(audioCtx.destination);
@@ -211,6 +201,7 @@
 		}
 		
 		function setupUI(){
+   
 			document.querySelector("#trackSelect").onchange = function(e){
 				playStream(audioElement,e.target.value);
 				currentSound = e.target.value;
@@ -347,7 +338,7 @@
           prevData[i] = data[i];
       }
           zeroGravity();
-			
+            manipulateAudio();
 			 
 		} //End of update
         
@@ -379,6 +370,10 @@
 			}
 			// .. and do nothing if the method is not supported
 		};
+        
+        function manipulateAudio(){
+            delayNode.delayTime.value=delayAmount;
+        }
 		
 		
 		window.addEventListener("load",init);
@@ -419,10 +414,8 @@
         <label for="bubbles"> Bubbles Slider</label> <br/>
         <input id="bubbles" type="range" min="10" max="60" step="3" value="20">
         <span id="sliderResults">???</span> <br>
-        <input type="checkbox" id="invert" name="noise" value="false"> Invert <br>
-        <input type="checkbox" id= "noise" name="noise" value="noise"> Noise <br>
-        <input type="checkbox" id="tint" name="noise" value="noise"> Tint Red <br>
-        <input type="checkbox" id="lines" name="lines" value="noise"> Lines <br>
+        <input type="checkbox" id="delay" name="delay" value="false"> Delay <br>
+
 		<br/>
         <button id="fsButton">Go Full Screen</button><br>
 	</div>
