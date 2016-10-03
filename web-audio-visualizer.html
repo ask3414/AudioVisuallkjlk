@@ -219,18 +219,25 @@
 			document.querySelector("#colorSelect").onchange = function(e){
 				switch(e.target.value){
           case 'blue':
+            colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
             break;
           case 'orange':
+            colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
             break;
           case 'red':
+            colors = new Array('rgb(255,0,59)', 'rgb(255,85,90)', 'rgb(255,255,255)');
             break;
           case 'pink':
+            colors = new Array('rgb(255,0,125)', 'rgb(255,135,230)', 'rgb(255,255,255)');
             break;
           case 'purple':
+            colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
             break;
           case 'green':
+            colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
             break;
           case 'allColors':
+            colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
             break;
         }
 			};
@@ -329,9 +336,9 @@
           }
           
           else{
-            drawBar('rgba(0,140,175,1)', barx, bartop, barbot, barWidth);
-            drawBar('rgba(0,200,230,1)', barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
-            drawBar('rgba(255,255,255,1)', barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
+            drawBar(colors[0], barx, bartop, barbot, barWidth);
+            drawBar(colors[1], barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
+            drawBar(colors[2], barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
 
             if((data[i] - prevData[i]) >= amtCircs){
                 createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
