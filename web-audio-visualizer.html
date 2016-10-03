@@ -211,17 +211,9 @@
 		}
 		
 		function setupUI(){
-      document.querySelector("#trackSelect").onchange = function(e){
-        playStream(audioElement,e.target.value);
-        currentSound = e.target.value;
-      };
-
-			document.querySelector("#colorSelect").onchange = function(e){
-				switch(e.target.value){
-          case 'blue':
-          case 'orange':
-          case 'red':
-        }
+			document.querySelector("#trackSelect").onchange = function(e){
+				playStream(audioElement,e.target.value);
+				currentSound = e.target.value;
 			};
 			
 			document.querySelector("#fsButton").onclick = function(){
@@ -281,7 +273,7 @@
                 ctx.save();
                 ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
                 ctx.drawImage(skullJaw, 295, skullY+100,skullWidth,skullHeight);
-                ctx.drawImage(skullHead, 300, 170,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, canvas.width-1200, 170,skullWidth,skullHeight);
                 
                 ctx.drawImage(skullHelmet, 300,170,skullWidth,skullHeight);
                 
@@ -385,17 +377,6 @@
 				<option value="media/HighScore.mp3">High Score</option>
 			</select>
 		</label>
-    <label>Color Scheme: 
-      <select id="colorSelect" >
-        <option value="blue">Blue</option>
-        <option value="orange">Orange</option>
-        <option value="red">Red</option>
-        <option value="pink">Pink</option>
-        <option value="purple">Purple</option>
-        <option value="green">Green</option>
-        <option value="allColors">All the Colors</option>
-      </select>
-    </label>
 		<br/>
         <br/>
         <label for="bubbles"> Bubbles Slider</label> <br/>
