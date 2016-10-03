@@ -44,8 +44,10 @@
     var invert = false, tintRed=false, noise=false, lines=false;
     var starsx = [];
     var starsy = [];
+    var colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
     var barx,bartop,barbot;
     var gravCircs = [];
+    var amtCircs = 20;
     var prevData = [NUM_SAMPLES];
 		var skullHead, skullJaw, skullHelmet;
 
@@ -93,8 +95,6 @@
 			
 			// get sound track <select> and Full Screen button working
 			setupUI();
-            // makeStars();
-			drawCircle(60,60);
 
 			// skull things
             skullHelmet= new Image();
@@ -121,48 +121,44 @@
             
            starsx[i]=xPos;
            starsy[i]=yPos;
-           // drawCircle(xPos, yPos);
         }
     }
     
-    function makeStars(){
-        
-        for(var i=0; i<starCount; i++){
-            drawCircle(starsx[i], starsy[i]);
-        }
-    }
-    
-    function createGravity(x, y, rad){
+    function createGravity(x, y, rad){    //creates a gravity circle and adds to array
         var circ = {
             gxPos : x,
             gyPos : y,
             gxSpeed : Math.random() * 3 - .5,
             gySpeed : Math.random() * 3,
             gRadius : rad,
-            grSpeed : Math.random() * 2
+            grSpeed : Math.random() * 2,
+            gColor: colors[Math.floor(Math.random()*3)]
         }
         gravCircs.push(circ);
     }
 
-    function zeroGravity(){
+    function zeroGravity(){   //updating and drawing all existing gravity circles
     	for(var i = 0; i < gravCircs.length; i++){
-            gravCircs[i].gxPos += gravCircs[i].gxSpeed;
+            gravCircs[i].gxPos += gravCircs[i].gxSpeed;   //update positions and radius shrinks
             gravCircs[i].gyPos -= gravCircs[i].gySpeed;
             gravCircs[i].gRadius -= gravCircs[i].grSpeed;
 
-            if(gravCircs[i].gRadius < 0){
+            if(gravCircs[i].gRadius < 0){   //circles that cannot be seen are removed from array
                 gravCircs.splice(i, 1);
             }
-            else{
+            else{     //draw gravity circles
+              ctx.save();
+              ctx.fillStyle = gravCircs[i].gColor;
               ctx.beginPath();
               ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gRadius, 0, Math.PI*2, false);
               ctx.fill();
               ctx.closePath();
+              ctx.restore();
             }
         }
     }
     
-    function drawCircle(xPos, yPos,alpha){
+    function drawStar(xPos, yPos,alpha){
         alpha=(alpha/100)-1;
     
         ctx.beginPath();
@@ -201,17 +197,17 @@
 			document.querySelector("#fsButton").onclick = function(){
 				requestFullscreen(canvas);
 			};
-            document.querySelector("#slider1").onchange = function(e){
-			 	console.log("value=" + e.target.value);
-			 	 document.querySelector("#sliderResults").innerHTML = e.target.value;
-                 
-			 };
+      
+      document.querySelector("#bubbles").onchange = function(e){
+        amtCircs = e.target.value;
+        console.log(amtCircs);
+			};
 		}
 		
 		function playStream(audioElement,path){
 			audioElement.src = path;
 			audioElement.play();
-			audioElement.volume = 0.2;
+			audioElement.volume = 0.5;
 			document.querySelector('#status').innerHTML = "Now playing: " + path;
 		}
 		
@@ -229,10 +225,10 @@
             var jawY = 160;
 			
 			// DRAW!
-			ctx.clearRect(0,0,1400,800); 
+			ctx.clearRect(0,0,800,600); 
 			//make stars
   		for(var i=0; i<starCount; i++){
-   			 drawCircle(starsx[i], starsy[i], data[3]);
+   			 drawStar(starsx[i], starsy[i], data[5]);
 		  }
       var barSpacing = 5;
 			var barWidth = (canvas.width - barSpacing*29)/30;
@@ -266,8 +262,6 @@
             }
 
 			// loop through the data and draw!
-      ctx.fillStyle = 'rgba(0,140,175,1)'; 
-			ctx.strokeStyle = 'rgba(0,230,255,0.6)'; 
 			ctx.lineCap = 'round';
 
 			for(var i=0; i<85; i++) { 
@@ -281,11 +275,11 @@
 
           if(currentSound == SOUND_2){
             if((i < 5 || i > 11) && (i < 19 || i > 25)){
-              drawBar('rgba(0,140,175,1)', barx, bartop, barbot, barWidth);
-              drawBar('rgba(0,200,230,1)', barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
-              drawBar('rgba(255,255,255,1)', barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
+              drawBar(colors[0], barx, bartop, barbot, barWidth);
+              drawBar(colors[1], barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
+              drawBar(colors[2], barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
 
-              if((data[i] - prevData[i]) >= 20){
+              if((data[i] - prevData[i]) >= amtCircs){
                   createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
               }
             }
@@ -294,10 +288,9 @@
           else{
             drawBar('rgba(0,140,175,1)', barx, bartop, barbot, barWidth);
             drawBar('rgba(0,200,230,1)', barx, barbot - bartop*barHeight/310, barbot, barWidth-5);
-            console.log(data[i] - prevData[i]);
             drawBar('rgba(255,255,255,1)', barx, barbot - bartop*barHeight/450, barbot, barWidth-11);
 
-            if((data[i] - prevData[i]) >= 20){
+            if((data[i] - prevData[i]) >= amtCircs){
                 createGravity(i * (barWidth + barSpacing) + barWidth/2, topSpacing + 256-data[i], barWidth);
             }
           }
@@ -344,7 +337,7 @@
 	</script>
 </head>
 <body>
-	<canvas id="canvas" width="1080" height="675"></canvas>
+	<canvas id="canvas" width="640" height="400"></canvas>
 	<div id="controls">
 		<audio controls loop></audio>
 		<label>Track: 
@@ -355,8 +348,8 @@
 			</select>
 		</label>
 		<button id="fsButton">Go Full Screen</button><br>
-        <label for="slider1"> Max Radius Slider</label>
-        <input id="slider1" type="range" min="10" max="200" step="20" value="50">
+        <label for="bubbles"> Bubbles Slider</label>
+        <input id="bubbles" type="range" min="10" max="60" step="3" value="20">
         <span id="sliderResults">???</span> <br>
         <input type="checkbox" id="invert" name="noise" value="false"> Invert <br>
         <input type="checkbox" id= "noise" name="noise" value="noise"> Noise <br>
