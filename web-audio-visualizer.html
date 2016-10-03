@@ -246,7 +246,7 @@
 		  }
       var barSpacing = 5;
 			var barWidth = (canvas.width - barSpacing*29)/30;
-			var barHeight = 200;
+			var barHeight = 100;
 			var topSpacing = 50;
            
 			if(currentSound==SOUND_2){
@@ -254,24 +254,24 @@
                  var skullWidth = 270+(data[0]*0.2);
                  var skullHeight = 290+(data[0]*0.2);
                  var skullY = data[1];
-                 if (skullY<160){
-                    skullY=160;
+                 if (skullY<180){
+                    skullY=180;
                 }
                 else if(skullY>160){
                     skullY=data[1]-50;
                 }
                 ctx.save();
                 ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
-                ctx.drawImage(skullJaw, 295, skullY,skullWidth,skullHeight);
-                ctx.drawImage(skullHead, 300, 70,skullWidth,skullHeight);
+                ctx.drawImage(skullJaw, 295, skullY+100,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, 300, 170,skullWidth,skullHeight);
                 
-                ctx.drawImage(skullHelmet, 300,70,skullWidth,skullHeight);
+                ctx.drawImage(skullHelmet, 300,170,skullWidth,skullHeight);
                 
                 //draw second skull
-                ctx.drawImage(skullJaw, 1000, skullY,skullWidth,skullHeight);
-                ctx.drawImage(skullHead, 1005, 70,skullWidth,skullHeight);
+                ctx.drawImage(skullJaw, 1000, skullY+100,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, 1005, 170,skullWidth,skullHeight);
                 
-                ctx.drawImage(skullHelmet, 1005,70,skullWidth,skullHeight);
+                ctx.drawImage(skullHelmet, 1005,170,skullWidth,skullHeight);
                 ctx.restore();
             }
 
@@ -284,8 +284,8 @@
 				// remember we have to draw our bars left-to-right and top-down
 
           barx = i * (barWidth + barSpacing) + barWidth/2;
-          bartop = topSpacing + 256-data[i];
-          barbot = bartop + barHeight;
+          bartop = topSpacing + 256-data[i]+100;
+          barbot = bartop + barHeight+100;
 
           if(currentSound == SOUND_2){
             if((i < 5 || i > 11) && (i < 19 || i > 25)){
