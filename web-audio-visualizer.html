@@ -60,9 +60,12 @@
 		var starsx = [];
         var starsy = [];
         
-		var canvas,ctx;
+        var delayAmount=0;
+        var delayNode;
+        
+		    var canvas,ctx;
        
-        var invert = false, tintRed=false, noise=false, lines=false, glitch=false;
+        var delay=false, glitch=false;
         
         var colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
         var barx,bartop,barbot;
@@ -77,31 +80,17 @@
 			canvas = document.querySelector('canvas');
 			ctx = canvas.getContext("2d");
       ctx.canvas.width = window.innerWidth-400;
-      ctx.canvas.height = window.innerHeight-100;    
-        document.querySelector("#noise").onchange=function(e){
+      ctx.canvas.height = window.innerHeight-100;
+       document.querySelector("#delay").onchange=function(e){
+           
             if(this.checked){
-                noise=true;
+                delayAmount=0.5;
+                console.log('checked');
             }
             else{
-                noise=false;
+                delayAmount=0;
             }
-        }; 
-        document.querySelector("#lines").onchange=function(e){
-            if(this.checked){
-                lines=true;
-            }
-            else{
-                lines=false;
-            }
-        };
-        document.querySelector("#tint").onchange=function(e){
-            if(this.checked){
-                tintRed=true;
-            }
-            else{
-                tintRed=false;
-            }
-        };    
+        };   
         document.querySelector("#glitch").onchange=function(e){
             if(this.checked){
                 glitch=true;
@@ -111,7 +100,7 @@
                 glitch=false;
                 console.log('not weirdly checked');
             }
-        }; 
+        };       
       initializeStars();
           // get reference to <audio> element on page
 			audioElement = document.querySelector('audio');
@@ -198,8 +187,11 @@
 
 			// create new AudioContext
 			audioCtx = new (window.AudioContext || window.webkitAudioContext);
-			
-			// create an analyser node
+            
+		
+            delayNode=audioCtx.createDelay();
+            
+            // create an analyser node
 			analyserNode = audioCtx.createAnalyser();
 			
 			// fft stands for Fast Fourier Transform
@@ -207,7 +199,11 @@
 			
 			// this is where we hook up the <audio> element to the analyserNode
 			sourceNode = audioCtx.createMediaElementSource(audioElement); 
-			sourceNode.connect(analyserNode);
+			sourceNode.connect(audioCtx.destination);
+            
+            sourceNode.connect(delayNode);
+            delayNode.connect(analyserNode);
+            analyserNode.connect(audioCtx.destination);
 			
 			// here we connect to the destination i.e. speakers
 			analyserNode.connect(audioCtx.destination);
@@ -215,6 +211,7 @@
 		}
 		
 		function setupUI(){
+   
 			document.querySelector("#trackSelect").onchange = function(e){
 				playStream(audioElement,e.target.value);
 				currentSound = e.target.value;
@@ -354,8 +351,9 @@
           }
           prevData[i] = data[i];
       }
-      zeroGravity();
-			manipulatePixels();
+          zeroGravity();
+          manipulatePixels();
+          manipulateAudio();
 			 
 		} //End of update
         
@@ -387,6 +385,10 @@
 			}
 			// .. and do nothing if the method is not supported
 		};
+        
+        function manipulateAudio(){
+            delayNode.delayTime.value=delayAmount;
+        }
 		
     function manipulatePixels(){
       var imageData=ctx.getImageData(0,0,canvas.width, canvas.height);
@@ -454,9 +456,7 @@
         <input id="bubbles" type="range" min="10" max="60" step="3" value="20">
         <span id="sliderResults">???</span> <br>
         <input type="checkbox" id="glitch" name="glitch" value="false"> Glitch <br>
-        <input type="checkbox" id= "noise" name="noise" value="noise"> Noise <br>
-        <input type="checkbox" id="tint" name="noise" value="noise"> Tint Red <br>
-        <input type="checkbox" id="lines" name="lines" value="noise"> Lines <br>
+        <input type="checkbox" id="delay" name="delay" value="false"> Delay <br>
 		<br/>
         <button id="fsButton">Go Full Screen</button><br>
 	</div>
