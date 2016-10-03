@@ -62,7 +62,7 @@
         
 		var canvas,ctx;
        
-        //var invert = false, tintRed=false, noise=false, lines=false;
+        var invert = false, tintRed=false, noise=false, lines=false, glitch=false;
         
         var colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
         var barx,bartop,barbot;
@@ -76,39 +76,43 @@
 			// set up canvas stuff
 			canvas = document.querySelector('canvas');
 			ctx = canvas.getContext("2d");
-            ctx.canvas.width = window.innerWidth-400;
-            ctx.canvas.height = window.innerHeight-100;
-             document.querySelector("#invert").onchange=function(e){
-                  if(this.checked){
-                      invert=true;
-                  }
-                  else{
-                      invert=false;
-                  }
-              };         document.querySelector("#noise").onchange=function(e){
-                  if(this.checked){
-                      noise=true;
-                  }
-                  else{
-                      noise=false;
-                  }
-              }; document.querySelector("#lines").onchange=function(e){
-                  if(this.checked){
-                      lines=true;
-                  }
-                  else{
-                      lines=false;
-                  }
-              };
-               document.querySelector("#tint").onchange=function(e){
-                  if(this.checked){
-                      tintRed=true;
-                  }
-                  else{
-                      tintRed=false;
-                  }
-              };
-            initializeStars();
+      ctx.canvas.width = window.innerWidth-400;
+      ctx.canvas.height = window.innerHeight-100;    
+        document.querySelector("#noise").onchange=function(e){
+            if(this.checked){
+                noise=true;
+            }
+            else{
+                noise=false;
+            }
+        }; 
+        document.querySelector("#lines").onchange=function(e){
+            if(this.checked){
+                lines=true;
+            }
+            else{
+                lines=false;
+            }
+        };
+        document.querySelector("#tint").onchange=function(e){
+            if(this.checked){
+                tintRed=true;
+            }
+            else{
+                tintRed=false;
+            }
+        };    
+        document.querySelector("#glitch").onchange=function(e){
+            if(this.checked){
+                glitch=true;
+                console.log('weirdly checked');
+            }
+            else{
+                glitch=false;
+                console.log('not weirdly checked');
+            }
+        }; 
+      initializeStars();
           // get reference to <audio> element on page
 			audioElement = document.querySelector('audio');
 			
@@ -246,10 +250,14 @@
 				requestFullscreen(canvas);
 			};
       
-            document.querySelector("#bubbles").onchange = function(e){
-                amtCircs = e.target.value;
-                console.log(amtCircs);
-            };
+      document.querySelector("#bubbles").onchange = function(e){
+          amtCircs = e.target.value;
+          console.log(amtCircs);
+      };
+
+      document.querySelector("#glitch").onchange = function(e){
+          glitch = e.target.checked;
+      };
 		}
 		
 		function playStream(audioElement,path){
@@ -346,8 +354,8 @@
           }
           prevData[i] = data[i];
       }
-          zeroGravity();
-			
+      zeroGravity();
+			manipulatePixels();
 			 
 		} //End of update
         
@@ -357,14 +365,14 @@
    			return color;
 		}
 
-        function drawBar(color, x, top, bot, width){
-            ctx.strokeStyle = color; 
-            ctx.lineWidth = width;
-            ctx.beginPath();
-            ctx.moveTo(x, top);
-            ctx.lineTo(x, bot);
-            ctx.stroke();
-        }
+    function drawBar(color, x, top, bot, width){
+        ctx.strokeStyle = color; 
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x, top);
+        ctx.lineTo(x, bot);
+        ctx.stroke();
+    }
 		
 		 // FULL SCREEN MODE
 		function requestFullscreen(element) {
@@ -380,6 +388,32 @@
 			// .. and do nothing if the method is not supported
 		};
 		
+    function manipulatePixels(){
+      var imageData=ctx.getImageData(0,0,canvas.width, canvas.height);
+      
+      var data = imageData.data;
+      var length = data.length;
+      var width= imageData.width;
+      
+      for(var i=0; i<length; i+=4){
+          if(glitch){
+            var row = Math.floor(i/4/width);
+            if (row%200>=0 && row%200<=150){
+              data[i]= data[i+24];
+              data[i+1]= data[i+25];
+              data[i+2]= data[i+26];
+              data[i+3]= data[i+27];
+            }
+            else if(row%175>=0 && row%175<=20){
+              data[i]= data[i-24];
+              data[i+1]= data[i-23];
+              data[i+2]= data[i-22];
+              data[i+3]= data[i-21];
+            }
+          }
+      }
+      ctx.putImageData(imageData,0,0);
+    }
 		
 		window.addEventListener("load",init);
 	}());
@@ -419,7 +453,7 @@
         <label for="bubbles"> Bubbles Slider</label> <br/>
         <input id="bubbles" type="range" min="10" max="60" step="3" value="20">
         <span id="sliderResults">???</span> <br>
-        <input type="checkbox" id="invert" name="noise" value="false"> Invert <br>
+        <input type="checkbox" id="glitch" name="glitch" value="false"> Glitch <br>
         <input type="checkbox" id= "noise" name="noise" value="noise"> Noise <br>
         <input type="checkbox" id="tint" name="noise" value="noise"> Tint Red <br>
         <input type="checkbox" id="lines" name="lines" value="noise"> Lines <br>
