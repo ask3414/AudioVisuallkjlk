@@ -6,23 +6,37 @@
 
     <meta charset="utf-8" />
 	<title>Web Audio Visualizer</title>
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet">
 	<style>
 	body {
-         background: #eeeeee;
-         font-family: tahoma, verdana, sans serif;
+         background: #191919;
+         font-family: Quicksand, verdana, sans serif;
+         color:aliceblue;
+        margin-top:0px;
       }
 
       canvas {
+          float:right;
         margin-left:10px;
-        margin-top:10px;
+        margin-top:0px;
         box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
         background: black;
     }
       
       #controls{
       	margin-left:10px;
-        margin-top:10px;
+        
       }
+        #title{
+            font-size:50px;
+            margin-left:10px;
+            margin-bottom:-40px;
+           
+        }
+        hr{
+            margin-bottom:50px;
+        }
+      
 	</style>
 	<script>
     // make stars
@@ -208,7 +222,7 @@
 			audioElement.src = path;
 			audioElement.play();
 			audioElement.volume = 0.5;
-			document.querySelector('#status').innerHTML = "Now playing: " + path;
+			
 		}
 		
 		function update() { 
@@ -225,14 +239,14 @@
             var jawY = 160;
 			
 			// DRAW!
-			ctx.clearRect(0,0,800,600); 
+			ctx.clearRect(0,0, 2000,1250); 
 			//make stars
   		for(var i=0; i<starCount; i++){
    			 drawStar(starsx[i], starsy[i], data[5]);
 		  }
       var barSpacing = 5;
 			var barWidth = (canvas.width - barSpacing*29)/30;
-			var barHeight = 100;
+			var barHeight = 200;
 			var topSpacing = 50;
            
 			if(currentSound==SOUND_2){
@@ -248,16 +262,16 @@
                 }
                 ctx.save();
                 ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
-                ctx.drawImage(skullJaw, 60, skullY,skullWidth,skullHeight);
-                ctx.drawImage(skullHead, 65, 70,skullWidth,skullHeight);
+                ctx.drawImage(skullJaw, 295, skullY,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, 300, 70,skullWidth,skullHeight);
                 
-                ctx.drawImage(skullHelmet, 65,70,skullWidth,skullHeight);
+                ctx.drawImage(skullHelmet, 300,70,skullWidth,skullHeight);
                 
                 //draw second skull
-                ctx.drawImage(skullJaw, 360, skullY,skullWidth,skullHeight);
-                ctx.drawImage(skullHead, 365, 70,skullWidth,skullHeight);
+                ctx.drawImage(skullJaw, 1000, skullY,skullWidth,skullHeight);
+                ctx.drawImage(skullHead, 1005, 70,skullWidth,skullHeight);
                 
-                ctx.drawImage(skullHelmet, 365,70,skullWidth,skullHeight);
+                ctx.drawImage(skullHelmet, 1005,70,skullWidth,skullHeight);
                 ctx.restore();
             }
 
@@ -337,25 +351,33 @@
 	</script>
 </head>
 <body>
-	<canvas id="canvas" width="640" height="400"></canvas>
+	<canvas id="canvas" width="1500" height="937"></canvas>
+    <div id="title"> 
+        <p> SPACE VIS</p>
+       
+    </div>
+     <hr>
 	<div id="controls">
-		<audio controls loop></audio>
-		<label>Track: 
-			<select id="trackSelect" >
+		<audio controls loop></audio><br/>
+        <br/>
+		<label>Choose Track: 
+			<select id="trackSelect">
 				<option value="media/PaperPlanes.mp3" selected>Paper Planes</option>
 				<option value="media/SpookyScarySkeletons.mp3">Spooky Scary Skeletons</option>
 				<option value="media/HighScore.mp3">High Score</option>
 			</select>
 		</label>
-		<button id="fsButton">Go Full Screen</button><br>
-        <label for="bubbles"> Bubbles Slider</label>
+		<br/>
+        <br/>
+        <label for="bubbles"> Bubbles Slider</label> <br/>
         <input id="bubbles" type="range" min="10" max="60" step="3" value="20">
         <span id="sliderResults">???</span> <br>
         <input type="checkbox" id="invert" name="noise" value="false"> Invert <br>
         <input type="checkbox" id= "noise" name="noise" value="noise"> Noise <br>
         <input type="checkbox" id="tint" name="noise" value="noise"> Tint Red <br>
         <input type="checkbox" id="lines" name="lines" value="noise"> Lines <br>
-		<p id="status">???</p>
+		<br/>
+        <button id="fsButton">Go Full Screen</button><br>
 	</div>
 </body>
 </html>
