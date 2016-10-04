@@ -3,356 +3,358 @@
 <html lang="en">
     
 <head>
-    <meta charset="utf-8" />
+  <meta charset="utf-8" />
 	<title>Web Audio Visualizer</title>
-    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:400,700" rel="stylesheet">
 	<style>
 
     *{
-           font-family: Quicksand, verdana, sans serif;
-           color:aliceblue;
+      font-family: Quicksand, verdana, sans serif;
+      color:aliceblue;
     }
 
-	   body {
-           background: #191919;
-           margin-top:0px;
-           width:100%;
-           height:100%;
-        }
+    body {
+      background: #191919;
+      margin-top:0px;
+      width:100%;
+      height:100%;
+    }
 
-      canvas {
-          float:right;
-          margin-left:10px;
-          margin-top:0px;
-          box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
-          background: black;
-      }
+    canvas {
+      float:right;
+      margin-left:10px;
+      margin-top:0px;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+      background: black;
+    }
       
-      #controls{
-      	  margin-left:10px;
-        
-      }
+    #controls{
+    	margin-left:10px;
+    }
 
-      input{
-        margin-left: 0;
-        margin-top: 10px;
-      }
+    input{
+      margin-left: 0;
+      margin-top: 10px;
+    }
 
-      select{
-        margin-left: 10px;
-        font-size: 12pt;
-        background: #151515;
-        border: none;
-        border-bottom: 1px solid aliceblue;
-        padding-bottom: 3px;
-      }
+    select{
+      margin-left: 10px;
+      font-size: 12pt;
+      background: #151515;
+      border: none;
+      border-bottom: 1px solid aliceblue;
+      padding-bottom: 3px;
+    }
 
-      button{
-          font-size: 14pt;
-          background-color: #111;
-          border: none;
-          box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
-          padding: 5px 10px;
-      }
+    button{
+      font-size: 14pt;
+      background-color: #111;
+      border: none;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+      padding: 5px 10px;
+    }
 
-      button:hover{
-        cursor: pointer;
-        color: #111;
-        background-color: aliceblue;
-      }
+    button:hover{
+      cursor: pointer;
+      color: #111;
+      background-color: aliceblue;
+    }
 
-      #title{
-         font-size:50px;
-         margin-left:10px;
-         margin-bottom:-40px;
-           
-      }
-      hr{
-         margin-bottom:50px;
-      }
+    #title{
+       font-size:50px;
+       margin-left:10px;
+       margin-bottom:-40px;
+         
+    }
+
+    hr{
+       margin-bottom:50px;
+    }
       
 	</style>
 	<script>
-    // make stars
-    // make skeleton heads
-    // program heads
-	// An IIFE ("Iffy") - see the notes in mycourses
-	(function(){
-		"use strict";
-		
-    //audio variables  
-    var audioElement;
-    var analyserNode;
-    var delayAmount=0;
-    var delayNode;
-    var type = 'frequency';
-		var NUM_SAMPLES = 256;
-		var SOUND_1 = 'media/PaperPlanes.mp3';
-		var SOUND_2 = 'media/SpookyScarySkeletons.mp3';
-		var SOUND_3 = 'media/HighScore.mp3';
-		var currentSound = SOUND_1;
+  	// An IIFE ("Iffy") - see the notes in mycourses
+  	(function(){
+  		"use strict";
+  		
+      //audio variables  
+      var audioElement;
+      var analyserNode;
+      var delayNode;
+      var delayAmount=0;
+      var type = 'frequency';
+  		var NUM_SAMPLES = 256;
+  		var SOUND_1 = 'media/PaperPlanes.mp3';
+  		var SOUND_2 = 'media/SpookyScarySkeletons.mp3';
+  		var SOUND_3 = 'media/HighScore.mp3';
+  		var currentSound = SOUND_1;
 
-    var canvas,ctx;
-    
-    //Stars Variables
-		var starCount=200;
-		var starsx = [];
-    var starsy = [];
-    
-    //manipulation variables
-    var delay=false
-    var glitch=false;
-    var grdAlpha= 0.3;
-    
-    //main drawing variables
-    var colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
-    var barx,bartop,barbot;
-    var gravCircs = [];
-    var amtCircs = 20;
-    var prevData = [NUM_SAMPLES];
-		var skullHead, skullJaw, skullHelmet;
-
-		function init(){
-			// set up canvas
-			canvas = document.querySelector('canvas');
-			ctx = canvas.getContext("2d");
-      ctx.canvas.width = window.innerWidth-400;
-      ctx.canvas.height = window.innerHeight-100;      
-
-      // set up audio
-			audioElement = document.querySelector('audio');
-			analyserNode = createWebAudioContextWithAnalyserNode(audioElement);
-
-			// Get the Skull images
-      skullHelmet= new Image();
-      skullHelmet.src="media/skulls-Helmet.png";
+      var canvas,ctx;
       
-      skullHead = new Image();
-      skullHead.src="media/skulls-Top.png"
+      //Stars Variables
+  		var starCount=200;
+  		var starsx = [];
+      var starsy = [];
       
-      skullJaw=new Image();
-      skullJaw.src="media/skulls-Bottom.png";
-			
-      //set up other visuals
-      initializeStars();
-      setupUI();
+      //manipulation variables
+      var delay=false
+      var glitch=false;
+      var grdAlpha= 0.3;
+      
+      //main drawing variables
+      var colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
+      var barx,bartop,barbot;
+      var gravCircs = [];
+      var amtCircs = 20;
+      var prevData = [NUM_SAMPLES];
+  		var skullHead, skullJaw, skullHelmet;
 
-			// load and play default sound into audio element
-			playStream(audioElement,SOUND_1);
-			// start animation loop
-			update();
-		}
-		
-		function initializeStars(){ //Initialize the stars
+  		function init(){
+  			// set up canvas
+  			canvas = document.querySelector('canvas');
+  			ctx = canvas.getContext("2d");
+        ctx.canvas.width = window.innerWidth-400;
+        ctx.canvas.height = window.innerHeight-100;      
+
+        // set up audio
+  			audioElement = document.querySelector('audio');
+  			analyserNode = createWebAudioContextWithAnalyserNode(audioElement);
+
+  			// Get the Skull images
+        skullHelmet= new Image();
+        skullHelmet.src="media/skulls-Helmet.png";
         
-            for(var i=0; i<starCount; i++){
+        skullHead = new Image();
+        skullHead.src="media/skulls-Top.png"
+        
+        skullJaw=new Image();
+        skullJaw.src="media/skulls-Bottom.png";
+  			
+        //set up other visuals
+        initializeStars();
+        setupUI();
 
-                var xPos=Math.random()*canvas.width;
-                var yPos = Math.random()*canvas.height;
+  			// load and play default sound into audio element
+  			playStream(audioElement,SOUND_1);
+  			// start animation loop
+  			update();
+  		}
+  		
+  		function initializeStars(){ //Initialize the star positions
+        for(var i=0; i<starCount; i++){
+          var xPos=Math.random()*canvas.width;
+          var yPos = Math.random()*canvas.height;
 
-               starsx[i]=xPos;
-               starsy[i]=yPos;
-            }
+          starsx[i]=xPos;
+          starsy[i]=yPos;
         }
+      }
 
-        function createGravity(x, y, rad){    //creates a gravity circle and adds to array
-            var circ = {
-                gxPos : x,
-                gyPos : y,
-                gxSpeed : Math.random() * 3 - .5,
-                gySpeed : Math.random() * 3,
-                gRadius : rad,
-                grSpeed : Math.random() * 2,
-                gColor: colors[Math.floor(Math.random()*3)]
-            }
-            gravCircs.push(circ);
+      function createGravity(x, y, rad){    //creates a gravity circle and adds to array
+        var circ = {
+          gxPos : x,
+          gyPos : y,
+          gxSpeed : Math.random() * 3 - .5,
+          gySpeed : Math.random() * 3,
+          gRadius : rad,
+          grSpeed : Math.random() * 2,
+          gColor: colors[Math.floor(Math.random()*3)]
         }
+        gravCircs.push(circ);
+      }
 
-        function zeroGravity(){   //updating and drawing all existing gravity circles
-          for(var i = 0; i < gravCircs.length; i++){
-            gravCircs[i].gxPos += gravCircs[i].gxSpeed;   //update positions and radius shrinks
-            gravCircs[i].gyPos -= gravCircs[i].gySpeed;
-            gravCircs[i].gRadius -= gravCircs[i].grSpeed;
+      function zeroGravity(){   //updating and drawing all existing gravity circles
+        for(var i = 0; i < gravCircs.length; i++){
+          gravCircs[i].gxPos += gravCircs[i].gxSpeed;   //update positions and radius shrinks
+          gravCircs[i].gyPos -= gravCircs[i].gySpeed;
+          gravCircs[i].gRadius -= gravCircs[i].grSpeed;
 
-            if(gravCircs[i].gRadius < 0){   //circles that cannot be seen are removed from array
-              gravCircs.splice(i, 1);
-            }
-            else{     //draw gravity circles
-              ctx.save();
-              ctx.fillStyle = gravCircs[i].gColor;
-              ctx.beginPath();
-              ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gRadius, 0, Math.PI*2, false);
-              ctx.fill();
-              ctx.closePath();
-              ctx.restore();
-            }
+          if(gravCircs[i].gRadius < 0){   //circles that cannot be seen are removed from array
+            gravCircs.splice(i, 1);
+          }
+          else{     //draw gravity circles
+            ctx.save();
+            ctx.fillStyle = gravCircs[i].gColor;
+            ctx.beginPath();
+            ctx.arc(gravCircs[i].gxPos, gravCircs[i].gyPos, gravCircs[i].gRadius, 0, Math.PI*2, false);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
           }
         }
+      }
 
-        function drawStar(xPos, yPos,alpha){
-            alpha=(alpha/100)-1;
+      function drawStar(xPos, yPos,alpha){
+        alpha=(alpha/100)-1;
 
-            ctx.beginPath();
-            ctx.fillStyle='rgba(255,255,255,'+alpha+')';
-            ctx.arc(xPos,yPos,2, 0,2*Math.PI,false);
-            ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle='rgba(255,255,255,'+alpha+')';
+        ctx.arc(xPos,yPos,2, 0,2*Math.PI,false);
+        ctx.fill();
 
-        }
-		function createWebAudioContextWithAnalyserNode(audioElement) {
-			var audioCtx, analyserNode, sourceNode;
+      }
 
-			// create new AudioContext
-			audioCtx = new (window.AudioContext || window.webkitAudioContext);
-            
-		
-      delayNode=audioCtx.createDelay();
-            
-      // create an analyser node
-			analyserNode = audioCtx.createAnalyser();
-			
-			// fft stands for Fast Fourier Transform
-			analyserNode.fftSize = NUM_SAMPLES;
-			
-			// this is where we hook up the <audio> element to the analyserNode
-			sourceNode = audioCtx.createMediaElementSource(audioElement); 
-			sourceNode.connect(audioCtx.destination);
-            
-      sourceNode.connect(delayNode);
-      delayNode.connect(analyserNode);
-      analyserNode.connect(audioCtx.destination);
-			
-			// here we connect to the destination i.e. speakers
-			analyserNode.connect(audioCtx.destination);
-			return analyserNode;
-		}
-		
-		function setupUI(){
-   
-			document.querySelector("#trackSelect").onchange = function(e){
-				playStream(audioElement,e.target.value);
-				currentSound = e.target.value;
-			};
-			
-      document.querySelector("#colorSelect").onchange = function(e){
-        switch(e.target.value){
-          case 'blue':
-            colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
-            break;
-          case 'orange':
-            colors = new Array('rgb(255,80,0)', 'rgb(255,175,110)', 'rgb(255,255,255)');
-            break;
-          case 'red':
-            colors = new Array('rgb(255,0,59)', 'rgb(255,130,125)', 'rgb(255,255,255)');
-            break;
-          case 'pink':
-            colors = new Array('rgb(255,0,125)', 'rgb(255,135,230)', 'rgb(255,255,255)');
-            break;
-          case 'purple':
-            colors = new Array('rgb(160,0,220)', 'rgb(210,125,255)', 'rgb(255,255,255)');
-            break;
-          case 'green':
-            colors = new Array('rgb(0,185,120)', 'rgb(0,245,165)', 'rgb(255,255,255)');
-            break;
-        }
-      };
-      
-			document.querySelector("#fsButton").onclick = function(){
-				requestFullscreen(canvas);
-			};
-      
-      document.querySelector("#bubbles").onchange = function(e){
+  		function createWebAudioContextWithAnalyserNode(audioElement) {
+  			var audioCtx, analyserNode, sourceNode;
+
+  			// create new AudioContext
+  			audioCtx = new (window.AudioContext || window.webkitAudioContext);
+              
+        // create an analyser node
+        analyserNode = audioCtx.createAnalyser();
+        
+        // fft stands for Fast Fourier Transform
+        analyserNode.fftSize = NUM_SAMPLES;
+        
+        // this is where we hook up the <audio> element to the analyserNode
+        sourceNode = audioCtx.createMediaElementSource(audioElement); 
+        sourceNode.connect(audioCtx.destination);
+
+  		  //create delay node, not used in class
+        delayNode=audioCtx.createDelay();
+              
+        sourceNode.connect(delayNode);
+        delayNode.connect(analyserNode);
+        analyserNode.connect(audioCtx.destination);
+        
+        // here we connect to the destination i.e. speakers
+        analyserNode.connect(audioCtx.destination);
+        return analyserNode;
+  		}
+  		
+  		function setupUI(){ //updates visualizer based on ui controls
+  			document.querySelector("#trackSelect").onchange = function(e){
+  				playStream(audioElement,e.target.value);
+  				currentSound = e.target.value;
+  			};
+  			
+        document.querySelector("#colorSelect").onchange = function(e){
+          switch(e.target.value){
+            case 'blue':
+              colors = new Array('rgb(0,140,175)', 'rgb(0,230,255)', 'rgb(255,255,255)');
+              break;
+            case 'orange':
+              colors = new Array('rgb(255,80,0)', 'rgb(255,175,110)', 'rgb(255,255,255)');
+              break;
+            case 'red':
+              colors = new Array('rgb(255,0,59)', 'rgb(255,130,125)', 'rgb(255,255,255)');
+              break;
+            case 'pink':
+              colors = new Array('rgb(255,0,125)', 'rgb(255,135,230)', 'rgb(255,255,255)');
+              break;
+            case 'purple':
+              colors = new Array('rgb(160,0,220)', 'rgb(210,125,255)', 'rgb(255,255,255)');
+              break;
+            case 'green':
+              colors = new Array('rgb(0,185,120)', 'rgb(0,245,165)', 'rgb(255,255,255)');
+              break;
+          }
+        };
+        
+  			document.querySelector("#fsButton").onclick = function(){
+  				requestFullscreen(canvas);
+  			};
+        
+        document.querySelector("#bubbles").onchange = function(e){
           amtCircs = 60-e.target.value;
+          if(amtCircs == 50){      //makes sure no bubbles appear for 0%
+            amtCircs = canvas.height;
+          }
           document.querySelector('#bubbleSliderResults').innerHTML = Math.floor((e.target.value - 10)*2) + "%";
-      };
-      document.querySelector("#opac").onchange = function(e){
+        };
+
+        document.querySelector("#opac").onchange = function(e){
           grdAlpha = e.target.value;
           document.querySelector('#opacSliderResults').innerHTML = Math.floor(e.target.value*100) + "%";
-      };
-      document.querySelector("#glitch").onchange = function(e){
+        };
+
+        document.querySelector("#glitch").onchange = function(e){
           glitch = e.target.checked;
-      };
-     document.querySelector("#delay").onchange=function(e){
+        };
+
+        document.querySelector("#delay").onchange=function(e){
           if(this.checked){
               delayAmount=0.5;
           }
           else{
               delayAmount=0;
           }
-      };
-      document.querySelector("#audioType").onchange = function(e){
-          if(e.target.checked)
-            type = 'waveform';
-          else
-            type = 'frequency';
-      };
-		}
-		
-		function playStream(audioElement,path){
-			audioElement.src = path;
-			audioElement.play();
-			audioElement.volume = 0.5;
-			
-		}
-		
-		function update() { 
-			// this schedules a call to the update() method in 1/60 seconds
-			requestAnimationFrame(update);
-			
-			// create a new array of 8-bit integers (0-255)
-			var data = new Uint8Array(NUM_SAMPLES/2); 
-			
-			// populate the array with the frequency data
-			getAudioDataByType(data);
-			
-			// DRAW!
-			ctx.clearRect(0,0, 2000,1250); 
-			//make stars
-      for(var i=0; i<starCount; i++){
-           drawStar(starsx[i], starsy[i], data[5]);
-      }
-      
-      //draw skulls for Spooky Scary Skeletons  
-			if(currentSound==SOUND_2){
-         var skullWidth = 270+(data[0]*0.2);
-         var skullHeight = 290+(data[0]*0.2);
-         var skullY = (data[3]%50+180);
+        };
+
+        document.querySelector("#audioType").onchange = function(e){
+            if(e.target.checked)
+              type = 'waveform';
+            else
+              type = 'frequency';
+        };
+  		}
+  		
+  		function playStream(audioElement,path){   //plays audio
+  			audioElement.src = path;
+  			audioElement.play();
+  			audioElement.volume = 0.5;
+  		}
+  		
+  		function update() { 
+  			// this schedules a call to the update() method in 1/60 seconds
+  			requestAnimationFrame(update);
+  			
+  			// create a new array of 8-bit integers (0-255)
+  			var data = new Uint8Array(NUM_SAMPLES/2); 
+  			
+  			// populate the array with the frequency data
+  			getAudioDataByType(data);
+  			
+  			//clearing everything from previous frame before drawing
+  			ctx.clearRect(0,0, 2000,1250); 
+
+  			//make stars
+        for(var i=0; i<starCount; i++){
+             drawStar(starsx[i], starsy[i], data[5]);
+        }
         
+        //draw skulls for Spooky Scary Skeletons  
+  			if(currentSound==SOUND_2){
+           var skullWidth = 270+(data[0]*0.2);
+           var skullHeight = 290+(data[0]*0.2);
+           var skullY = (data[3]%50+180);
+          
+          ctx.save();
+          //draw first skull
+          ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
+          ctx.drawImage(skullJaw, (canvas.width/7)-5, skullY+100,skullWidth,skullHeight);
+          ctx.drawImage(skullHead, canvas.width/7, 170,skullWidth,skullHeight);
+          
+          ctx.drawImage(skullHelmet, canvas.width/7,170,skullWidth,skullHeight);
+          
+          //draw second skull
+          ctx.drawImage(skullJaw, (canvas.width*4.2/7)-5, skullY+100,skullWidth,skullHeight);
+          ctx.drawImage(skullHead, canvas.width*4.2/7, 170,skullWidth,skullHeight);
+          
+          ctx.drawImage(skullHelmet, canvas.width*4.2/7,170,skullWidth,skullHeight);
+          ctx.restore();
+        }
+
+        //draw the gradient
         ctx.save();
-        //draw first skull
-        ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
-        ctx.drawImage(skullJaw, (canvas.width/7)-5, skullY+100,skullWidth,skullHeight);
-        ctx.drawImage(skullHead, canvas.width/7, 170,skullWidth,skullHeight);
+        ctx.globalAlpha=grdAlpha;
+        var grd = ctx.createLinearGradient(0,canvas.height*1.3,0,canvas.height/2);
         
-        ctx.drawImage(skullHelmet, canvas.width/7,170,skullWidth,skullHeight);
-        
-        //draw second skull
-        ctx.drawImage(skullJaw, (canvas.width*4.2/7)-5, skullY+100,skullWidth,skullHeight);
-        ctx.drawImage(skullHead, canvas.width*4.2/7, 170,skullWidth,skullHeight);
-        
-        ctx.drawImage(skullHelmet, canvas.width*4.2/7,170,skullWidth,skullHeight);
+        grd.addColorStop(0,"rgba(255,0,59,1)");
+        grd.addColorStop(.8,"rgba(0,230,255,0.6)");
+        grd.addColorStop(1,"rgba(0,230,255,0)");
+        ctx.fillStyle=grd;
+        ctx.fillRect(0, canvas.height/2, canvas.width, canvas.height/2);
         ctx.restore();
-      }
-      //draw the gradient
-      ctx.save();
-      ctx.globalAlpha=grdAlpha;
-      var grd = ctx.createLinearGradient(0,canvas.height*1.3,0,canvas.height/2);
-      
-      grd.addColorStop(0,"rgba(255,0,59,1)");
-      grd.addColorStop(.8,"rgba(0,230,255,0.6)");
-      grd.addColorStop(1,"rgba(0,230,255,0)");
-      ctx.fillStyle=grd;
-      ctx.fillRect(0, canvas.height/2, canvas.width, canvas.height/2);
-      ctx.restore();
 
-			// loop through the data and draw bars
-      var barSpacing = 5;
-      var barWidth = (canvas.width - barSpacing*29)/30;
-      var barHeight = 200;
-      var topSpacing = 150;
-			ctx.lineCap = 'round';
+  			// loop through the data and draw bars
+        var barSpacing = 5;
+        var barWidth = (canvas.width - barSpacing*29)/30;
+        var barHeight = 200;
+        var topSpacing = 150;
+  			ctx.lineCap = 'round';
 
-			for(var i=0; i<85; i++) {
-
+  			for(var i=0; i<85; i++) {
           barx = i * (barWidth + barSpacing) + barWidth/2;
           bartop = topSpacing + 256-data[i];
           barbot = bartop + barHeight;
@@ -365,7 +367,7 @@
               drawBar(colors[2], barx, barbot - bartop*barHeight/480, barbot, barWidth-11);
 
               if((data[i] - prevData[i]) >= amtCircs){
-                  createGravity(i * (barWidth + barSpacing) + barWidth/2, bartop, barWidth);
+                createGravity(i * (barWidth + barSpacing) + barWidth/2, bartop, barWidth);
               }
             }
           }
@@ -376,61 +378,62 @@
             drawBar(colors[2], barx, barbot - bartop*barHeight/600, barbot, barWidth-11);
 
             if((data[i] - prevData[i]) >= amtCircs){    //creates a circle for bars that surpass speed
-                createGravity(i * (barWidth + barSpacing) + barWidth/2, bartop, barWidth);
+              createGravity(i * (barWidth + barSpacing) + barWidth/2, bartop, barWidth);
             }
           }
           prevData[i] = data[i];  //update previous data array
-      }
-          zeroGravity();
-          manipulatePixels();
-          manipulateAudio();
+        }
+        zeroGravity();
+        manipulatePixels();
+        manipulateAudio();
+            
+  		} //End of update
           
-		} //End of update
-        
-		// HELPERS
-    function getAudioDataByType(data){
-      if(type=='frequency')
-        analyserNode.getByteFrequencyData(data);
-      else
-        analyserNode.getByteTimeDomainData(data);
-    }
+  		// HELPERS
+      function getAudioDataByType(data){
+        if(type=='frequency')
+          analyserNode.getByteFrequencyData(data);
+        else
+          analyserNode.getByteTimeDomainData(data);
+      }
 
-    function drawBar(color, x, top, bot, width){
+      function drawBar(color, x, top, bot, width){
         ctx.strokeStyle = color; 
         ctx.lineWidth = width;
         ctx.beginPath();
         ctx.moveTo(x, top);
         ctx.lineTo(x, bot);
         ctx.stroke();
-    }
-		
-		 // FULL SCREEN MODE
-		function requestFullscreen(element) {
-			if (element.requestFullscreen) {
-			  element.requestFullscreen();
-			} else if (element.mozRequestFullscreen) {
-			  element.mozRequestFullscreen();
-			} else if (element.mozRequestFullScreen) { // camel-cased 'S' was changed to 's' in spec
-			  element.mozRequestFullScreen();
-			} else if (element.webkitRequestFullscreen) {
-			  element.webkitRequestFullscreen();
-			}
-		}
-    
-    //MANIPULATIONS
-    function manipulateAudio(){
-        delayNode.delayTime.value=delayAmount;
-    }
-		
-    function manipulatePixels(){
-      var imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
-      var data = imageData.data;
-      var length = data.length;
-      var width= imageData.width;
+      }
+  		
+  		 // FULL SCREEN MODE
+  		function requestFullscreen(element) {
+  			if (element.requestFullscreen) {
+  			  element.requestFullscreen();
+  			} else if (element.mozRequestFullscreen) {
+  			  element.mozRequestFullscreen();
+  			} else if (element.mozRequestFullScreen) { // camel-cased 'S' was changed to 's' in spec
+  			  element.mozRequestFullScreen();
+  			} else if (element.webkitRequestFullscreen) {
+  			  element.webkitRequestFullscreen();
+  			}
+  		}
       
-      for(var i=0; i<length; i+=4){
+      //MANIPULATIONS
+      function manipulateAudio(){
+        delayNode.delayTime.value=delayAmount;
+      }
+  		
+      function manipulatePixels(){
+        var imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+        var data = imageData.data;
+        var length = data.length;
+        var width= imageData.width;
+        
+        for(var i=0; i<length; i+=4){
           if(glitch){     //creates glitch effect by replacing color at pixel with a pixel at another location
             var row = Math.floor(i/4/width);
+
             if (row%200>=0 && row%200<=150){
               data[i]= data[i+24];
               data[i+1]= data[i+25];
@@ -444,55 +447,50 @@
               data[i+3]= data[i-21];
             }
           }
+        }
+        ctx.putImageData(imageData,0,0);
       }
-      ctx.putImageData(imageData,0,0);
-    }
-		
-		window.addEventListener("load",init);
-	}());
-		
+  		
+  		window.addEventListener("load",init);
+  	}());
 	</script>
 </head>
 <body>
 	<canvas id="canvas"></canvas>
-    <div id="title"> 
-        <p> SPACE VIS</p>
-       
-    </div>
-     <hr>
+  <div id="title"> 
+    <p> SPACE VIS</p>       
+  </div>
+  <hr/>
 	<div id="controls">
-		<audio controls loop></audio><br/>
-        <br/>
-		<label>Choose Track: 
-			<select id="trackSelect">
-				<option value="media/PaperPlanes.mp3" selected>Paper Planes</option>
-				<option value="media/SpookyScarySkeletons.mp3">Spooky Scary Skeletons</option>
-				<option value="media/HighScore.mp3">High Score</option>
-			</select>
-		</label><br><br>
-    <label>Color Scheme: 
-      <select id="colorSelect" >
-        <option value="blue">Blue</option>
-        <option value="orange">Orange</option>
-        <option value="red">Red</option>
-        <option value="pink">Pink</option>
-        <option value="purple">Purple</option>
-        <option value="green">Green</option>
-      </select>
-    </label><br/><br/>
-        <label for="bubbles"> Bubbles Slider</label> <br/>
-        <input id="bubbles" type="range" min="10" max="60" step="5" value="40">
-        <span id="bubbleSliderResults">80%</span> <br/><br/>
-        
-        <label for="opac"> Gradient Opacity Slider</label> <br/>
-        <input id="opac" type="range" min="0" max="1" step="0.05" value="0.3">
-        <span id="opacSliderResults">30%</span> <br/><br/>
-        
-        <input type="checkbox" id="glitch" name="glitch" value="false"> Glitch <br>
-        <input type="checkbox" id="delay" name="delay" value="false"> Delay <br>
-        <input type="checkbox" id="audioType" name="audioType" value="false"> Waveform <br>
-		<br/>
-        <button id="fsButton">Go Full Screen</button><br>
+  	<audio controls loop></audio><br/><br/>
+  	<label>Choose Track: </label>
+  	<select id="trackSelect">
+  		<option value="media/PaperPlanes.mp3" selected>Paper Planes</option>
+  		<option value="media/SpookyScarySkeletons.mp3">Spooky Scary Skeletons</option>
+  		<option value="media/HighScore.mp3">High Score</option>
+  	</select><br><br>
+    <label>Color Scheme: </label>
+    <select id="colorSelect" >
+      <option value="blue">Blue</option>
+      <option value="orange">Orange</option>
+      <option value="red">Red</option>
+      <option value="pink">Pink</option>
+      <option value="purple">Purple</option>
+      <option value="green">Green</option>
+    </select>
+    <br/><br/>
+    <label for="bubbles"> Bubbles Slider</label> <br/>
+    <input id="bubbles" type="range" min="10" max="60" step="5" value="40">
+    <span id="bubbleSliderResults">80%</span> <br/><br/>
+    
+    <label for="opac"> Gradient Opacity Slider</label> <br/>
+    <input id="opac" type="range" min="0" max="1" step="0.05" value="0.3">
+    <span id="opacSliderResults">30%</span> <br/><br/>
+    
+    <input type="checkbox" id="glitch" name="glitch" value="false"> Glitch <br>
+    <input type="checkbox" id="delay" name="delay" value="false"> Delay <br>
+    <input type="checkbox" id="audioType" name="audioType" value="false"> Waveform <br/><br/>
+    <button id="fsButton">Go Full Screen</button><br>
 	</div>
 </body>
 </html>
