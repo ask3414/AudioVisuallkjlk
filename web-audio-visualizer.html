@@ -312,26 +312,22 @@
         for(var i=0; i<starCount; i++){
              drawStar(starsx[i], starsy[i], data[5]);
         }
-        
+
         //draw skulls for Spooky Scary Skeletons  
   			if(currentSound==SOUND_2){
-           var skullWidth = 270+(data[0]*0.2);
-           var skullHeight = 290+(data[0]*0.2);
-           var skullY = (data[3]%50+180);
+          var skullWidth = 270+(data[0]*0.2);
+          var skullHeight = 290+(data[0]*0.2);
+          var skullY = (data[3]%50+100);
           
           ctx.save();
           //draw first skull
-          ctx.translate(-(data[0]*0.1),-(data[0]*0.1));
-          ctx.drawImage(skullJaw, (canvas.width/7)-5, skullY+100,skullWidth,skullHeight);
-          ctx.drawImage(skullHead, canvas.width/7, 170,skullWidth,skullHeight);
-          
-          ctx.drawImage(skullHelmet, canvas.width/7,170,skullWidth,skullHeight);
-          
+          ctx.translate(canvas.width/4-skullWidth/2,170-(data[0]*0.1));
+          drawSkull(skullY, skullWidth, skullHeight);
+
           //draw second skull
-          ctx.drawImage(skullJaw, (canvas.width*4.2/7)-5, skullY+100,skullWidth,skullHeight);
-          ctx.drawImage(skullHead, canvas.width*4.2/7, 170,skullWidth,skullHeight);
-          
-          ctx.drawImage(skullHelmet, canvas.width*4.2/7,170,skullWidth,skullHeight);
+          ctx.translate(canvas.width/2,0);
+          drawSkull(skullY, skullWidth, skullHeight);
+
           ctx.restore();
         }
 
@@ -361,7 +357,7 @@
 
           //have gaps for skeletons
           if(currentSound == SOUND_2){
-            if((i < 5 || i > 11) && (i < 19 || i > 25)){
+            if((i < 4 || i > 10) && (i < 19 || i > 25)){
               drawBar(colors[0], barx, bartop, barbot, barWidth);
               drawBar(colors[1], barx, barbot - bartop*barHeight/400, barbot, barWidth-5);
               drawBar(colors[2], barx, barbot - bartop*barHeight/480, barbot, barWidth-11);
@@ -395,6 +391,14 @@
           analyserNode.getByteFrequencyData(data);
         else
           analyserNode.getByteTimeDomainData(data);
+      }
+
+      function drawSkull(jawY,width,height){
+        ctx.drawImage(skullJaw,-5,jawY,width,height);
+
+        ctx.drawImage(skullHead,0,0,width,height);
+          
+        ctx.drawImage(skullHelmet,0,0,width,height);
       }
 
       function drawBar(color, x, top, bot, width){
