@@ -355,27 +355,15 @@
           bartop = topSpacing + 256-data[i];
           barbot = bartop + barHeight;
 
-          //have gaps for skeletons
-          if(currentSound == SOUND_2){
-            if((i < 4 || i > 10) && (i < 19 || i > 25)){
+          //draw bars if not spooky scary skeletons, or have gaps for skeletons
+          if(currentSound != SOUND_2 || (currentSound == SOUND_2 && (i < 4 || i > 10) && (i < 19 || i > 25))) {
               drawBar(colors[0], barx, bartop, barbot, barWidth);
-              drawBar(colors[1], barx, barbot - bartop*barHeight/400, barbot, barWidth-5);
+              drawBar(colors[1], barx, barbot - bartop*barHeight/410, barbot, barWidth-5);
               drawBar(colors[2], barx, barbot - bartop*barHeight/480, barbot, barWidth-11);
 
               if((data[i] - prevData[i]) >= amtCircs){
                 createGravity(i * (barWidth + barSpacing) + barWidth/2, bartop, barWidth);
               }
-            }
-          }
-          
-          else{
-            drawBar(colors[0], barx, bartop, barbot, barWidth);
-            drawBar(colors[1], barx, barbot - bartop*barHeight/410, barbot, barWidth-5);
-            drawBar(colors[2], barx, barbot - bartop*barHeight/600, barbot, barWidth-11);
-
-            if((data[i] - prevData[i]) >= amtCircs){    //creates a circle for bars that surpass speed
-              createGravity(i * (barWidth + barSpacing) + barWidth/2, bartop, barWidth);
-            }
           }
           prevData[i] = data[i];  //update previous data array
         }
