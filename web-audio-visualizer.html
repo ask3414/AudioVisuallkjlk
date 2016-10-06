@@ -324,6 +324,13 @@
           ctx.translate(canvas.width/4-skullWidth/2,170-(data[0]*0.1));
           drawSkull(skullY, skullWidth, skullHeight);
 
+          ctx.save();
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(skullWidth*3/7, 170-(data[0]*0.1), 20, 0, Math.PI*2, false);
+          ctx.fill();
+          ctx.restore();
+
           //draw second skull
           ctx.translate(canvas.width/2,0);
           drawSkull(skullY, skullWidth, skullHeight);
